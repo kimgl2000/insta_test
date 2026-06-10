@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@seen.by.two mockup</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { background:#2e2e2e; font-family:'Roboto','Noto Naskh Arabic','Noto Sans Arabic',sans-serif; padding:16px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .toolbar { position:sticky; top:0; background:#1c1c1e; color:#fff; padding:10px 14px; display:flex; gap:10px; align-items:center; z-index:999; font-size:13px; flex-wrap:wrap; border-radius:10px; width:100%; max-width:380px; justify-content:center; direction:rtl; }
+  .toolbar button { background:#0095f6; color:#fff; border:0; padding:7px 12px; border-radius:6px; font-size:12px; cursor:pointer; }
+  .toolbar button.alt { background:#333; }
+  .hint { color:#bbb; font-size:11px; max-width:360px; line-height:1.6; text-align:center; direction:rtl; }
+
+  .phone { width:360px; background:#000; border-radius:34px; padding:10px; box-shadow:0 10px 40px rgba(0,0,0,.5); }
+  .screen { background:#000; border-radius:26px; overflow:hidden; height:720px; display:flex; flex-direction:column; color:#fff; position:relative; direction:rtl; }
+
+  .page { display:none; flex-direction:column; height:100%; }
+  .page.active { display:flex; }
+
+  /* grid page */
+  .igtop { height:48px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; border-bottom:.5px solid #262626; flex-shrink:0; }
+  .igtop .user { display:flex; align-items:center; gap:6px; font-weight:700; font-size:16px; }
+  .igtop .icons { display:flex; gap:18px; font-size:20px; }
+  .scroll { flex:1; overflow-y:auto; }
+  .phead { padding:14px 16px; }
+  .prow { display:flex; align-items:center; gap:22px; }
+  .pavatar { width:78px; height:78px; border-radius:50%; background:#555; flex-shrink:0; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:10px; color:#aaa; cursor:pointer; text-align:center; }
+  .pavatar img { width:100%; height:100%; object-fit:cover; }
+  .pstats { display:flex; flex:1; justify-content:space-around; text-align:center; }
+  .pstats b { display:block; font-size:16px; }
+  .pstats span { font-size:13px; color:#ccc; }
+  .pbio { padding:10px 4px 0; font-size:13px; line-height:1.5; }
+  .pbio .name { font-weight:700; }
+  .pedit { margin:12px 0 4px; display:flex; gap:6px; }
+  .pedit div { flex:1; background:#262626; text-align:center; padding:7px; border-radius:8px; font-size:13px; font-weight:600; }
+  .tabs { display:flex; border-top:.5px solid #262626; margin-top:10px; }
+  .tabs div { flex:1; text-align:center; padding:10px; font-size:20px; opacity:.5; }
+  .tabs div.active { opacity:1; border-top:1px solid #fff; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; }
+  .cell { position:relative; aspect-ratio:1; background:#5a5a5a; overflow:hidden; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .cell img { width:100%; height:100%; object-fit:cover; }
+  .cell .ph { color:#9a9a9a; font-size:10px; text-align:center; padding:4px; line-height:1.3; }
+  .cell .date { position:absolute; top:4px; right:4px; background:rgba(0,0,0,.6); font-size:9px; padding:2px 4px; border-radius:3px; display:none; direction:rtl; }
+  .cell.showdate .date { display:block; }
+  .cell .vid { position:absolute; top:5px; left:5px; font-size:12px; }
+  .navbtm { height:48px; display:flex; align-items:center; justify-content:space-around; border-top:.5px solid #262626; font-size:22px; flex-shrink:0; }
+
+  /* feed page */
+  .dtop { height:46px; display:flex; align-items:center; gap:12px; padding:0 14px; border-bottom:.5px solid #262626; font-size:15px; flex-shrink:0; }
+  .dtop .back { font-size:24px; cursor:pointer; }
+  .fpost { border-bottom:.5px solid #1c1c1c; padding-bottom:8px; }
+  .dhead { display:flex; align-items:center; gap:10px; padding:10px 14px; }
+  .dhead .av { width:32px; height:32px; border-radius:50%; background:#555; flex-shrink:0; }
+  .dhead .nm { font-weight:600; font-size:13px; }
+  .dimg { width:100%; aspect-ratio:1; background:#5a5a5a; display:flex; align-items:center; justify-content:center; color:#9a9a9a; font-size:12px; overflow:hidden; cursor:pointer; text-align:center; }
+  .dimg img { width:100%; height:100%; object-fit:cover; }
+  .dacts { display:flex; gap:16px; padding:10px 14px; font-size:22px; }
+  .dacts .sp { flex:1; }
+  .dacts .cbtn { cursor:pointer; }
+  .dlikes { padding:0 14px; font-weight:600; font-size:13px; }
+  .dcap { padding:6px 14px; font-size:13px; line-height:1.5; }
+  .dcap .u { font-weight:600; }
+  .ddate { padding:6px 14px 14px; font-size:11px; color:#888; }
+
+  /* comments page */
+  .clist { flex:1; overflow-y:auto; padding:6px 0; }
+  .citem { display:flex; gap:10px; padding:9px 14px; }
+  .citem .cav { width:32px; height:32px; border-radius:50%; background:#555; flex-shrink:0; }
+  .citem .cbody { font-size:13px; line-height:1.45; flex:1; }
+  .citem .cbody .cu { font-weight:600; }
+  .citem .cmeta { font-size:11px; color:#888; margin-top:4px; display:flex; gap:14px; }
+  .cinput { display:flex; align-items:center; gap:8px; padding:8px 12px; border-top:.5px solid #262626; flex-shrink:0; }
+  .cinput .cav { width:30px; height:30px; border-radius:50%; background:#555; flex-shrink:0; }
+  .cinput input { flex:1; background:transparent; border:0; color:#fff; font-size:14px; font-family:inherit; padding:6px 4px; outline:none; }
+  .cinput input::placeholder { color:#888; }
+  .cinput .send { color:#0095f6; font-weight:700; font-size:14px; cursor:pointer; padding:6px 8px; background:transparent; border:0; font-family:inherit; }
+  .cinput .send:disabled { opacity:.4; }
+
+  [contenteditable="true"]:focus { outline:1px dashed #0095f6; background:rgba(0,149,246,.08); }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="openUploader()">＋ نشر منشور</button>
+  <button onclick="toggleDates()">عرض التاريخ</button>
+  <button class="alt" onclick="toggleEdit()">تحرير النص <span id="editstate">OFF</span></button>
+  <button class="alt" onclick="goGrid()">الشبكة</button>
+  <button class="alt" onclick="location.reload()">↺ تصفير</button>
+</div>
+
+<!-- 현장 업로드 패널 -->
+<div id="uploader" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:2000; align-items:center; justify-content:center;">
+  <div style="background:#1c1c1e; color:#fff; width:320px; max-width:90vw; border-radius:14px; padding:18px; direction:rtl; font-family:inherit;">
+    <div style="font-weight:700; font-size:16px; margin-bottom:14px;">نشر منشور جديد</div>
+    <div id="upPreview" onclick="document.getElementById('upFile').click()" style="width:100%; aspect-ratio:1; background:#444; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#999; font-size:13px; cursor:pointer; overflow:hidden; margin-bottom:12px; position:relative; text-align:center;">اضغط لاختيار صورة / فيديو</div>
+    <input id="upFile" type="file" accept="image/*,video/*" style="display:none" onchange="upPick(event)">
+    <input id="upCap" type="text" placeholder="الوصف (مثال: غوانغ-آن-ري)" style="width:100%; background:#2a2a2c; border:0; color:#fff; padding:10px; border-radius:8px; font-size:14px; font-family:inherit; margin-bottom:8px; outline:none;">
+    <input id="upDate" type="text" value="الآن" placeholder="التاريخ / الوقت" style="width:100%; background:#2a2a2c; border:0; color:#fff; padding:10px; border-radius:8px; font-size:14px; font-family:inherit; margin-bottom:14px; outline:none;">
+    <div style="display:flex; gap:8px;">
+      <button onclick="upSubmit()" style="flex:1; background:#0095f6; color:#fff; border:0; padding:10px; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; font-family:inherit;">نشر</button>
+      <button onclick="closeUploader()" style="background:#333; color:#fff; border:0; padding:10px 14px; border-radius:8px; font-size:14px; cursor:pointer; font-family:inherit;">إلغاء</button>
+    </div>
+  </div>
+</div>
+<div class="hint">اضغط منشوراً في الشبكة ← يتحوّل إلى تمرير عمودي. زر 💬 يفتح التعليقات. اكتب تعليقاً واضغط نشر لإضافته. الخانات الرمادية = إضافة صورة.</div>
+
+<div class="phone">
+  <div class="screen">
+
+    <!-- الشبكة GRID -->
+    <div class="page active" id="pageGrid">
+      <div class="igtop"><div class="user">🔒 seen.by.two ▾</div><div class="icons">＋ ☰</div></div>
+      <div class="scroll">
+        <div class="phead">
+          <div class="prow">
+            <div class="pavatar" onclick="pickImg(this)"><span>صورة<br>الملف</span></div>
+            <div class="pstats">
+              <div><b id="pcount">19</b><span>منشور</span></div>
+              <div><b>2</b><span>متابع</span></div>
+              <div><b>2</b><span>يتابع</span></div>
+            </div>
+          </div>
+          <div class="pbio">
+            <div class="name editable">seen by two</div>
+            <div class="editable">📷 مشهدٌ رأيناه معاً · يوميات بالصور</div>
+          </div>
+          <div class="pedit"><div>تعديل الملف الشخصي</div><div>مشاركة</div></div>
+        </div>
+        <div class="tabs"><div class="active">▦</div><div>▷</div><div>👤</div></div>
+        <div class="grid" id="grid"></div>
+      </div>
+      <div class="navbtm"><span>🏠</span><span>🔍</span><span>＋</span><span>♡</span><span>👤</span></div>
+    </div>
+
+    <!-- التمرير العمودي FEED -->
+    <div class="page" id="pageFeed">
+      <div class="dtop"><span class="back" onclick="goGrid()">→</span><span style="font-weight:600">المنشورات</span></div>
+      <div class="scroll" id="feedscroll"></div>
+    </div>
+
+    <!-- التعليقات COMMENTS -->
+    <div class="page" id="pageComment">
+      <div class="dtop"><span class="back" onclick="goFeed()">→</span><span style="font-weight:600">التعليقات</span></div>
+      <div class="clist" id="clist"></div>
+      <div class="cinput">
+        <div class="cav"></div>
+        <input id="cfield" type="text" placeholder="أضف تعليقاً..." oninput="document.getElementById('csend').disabled=!this.value.trim()" onkeydown="if(event.key==='Enter')addComment()">
+        <button class="send" id="csend" onclick="addComment()" disabled>نشر</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const posts = [
+  {date:"٥ مارس ٢٠٢٤",  cap:"منشور ١) أمام التمثال", vid:false},
+  {date:"١٣ أبريل ٢٠٢٤", cap:"منشور ٢) حديقة سيول", vid:false},
+  {date:"٢٦ أبريل ٢٠٢٤", cap:"منشور ٣) قرية بُكتشون", vid:false},
+  {date:"٢ مايو ٢٠٢٤",  cap:"منشور ٤) زقاق السوق", vid:false},
+  {date:"١١ مايو ٢٠٢٤", cap:"منشور ٥) بحيرة سوكتشون ★", vid:false},
+  {date:"١٥ مايو ٢٠٢٤", cap:"منشور ٦) قفل برج نامسان ★", vid:false},
+  {date:"٢١ مايو ٢٠٢٤", cap:"منشور ٧) المتحف ★", vid:false},
+  {date:"٢١ مايو ٢٠٢٤", cap:"منشور ٨) المترو", vid:false},
+  {date:"٣٠ يونيو ٢٠٢٤", cap:"(آخر منشور)", vid:false},
+  {date:"الآن",         cap:"منشور ١) سيلفي بُكتشون", vid:false},
+  {date:"قبل ساعة",     cap:"منشور ٢) إعادة بحيرة سوكتشون", vid:false},
+  {date:"قبل ٣ ساعات",  cap:"منشور ٣) جدار دوكسوغونغ", vid:false},
+  {date:"قبل يوم",      cap:"منشور ٥) ألبوم الصور", vid:false},
+  {date:"قبل يوم",      cap:"منشور ٦) صورة حديقة سيول", vid:false},
+  {date:"قبل يومين",    cap:"منشور ١٥) فيديو يون-سو", vid:true},
+  {date:"قبل ٥ دقائق",  cap:"فيديو ٧) غوانغ-آن-ري", vid:true},
+  {date:"قبل ٤ دقائق",  cap:"فيديو ٨) هيون-ديه", vid:true},
+  {date:"قبل دقيقتين",  cap:"فيديو ٩) تشيونغ-سا-بو", vid:true},
+  {date:"الآن",         cap:"منشور ١٠) seen by two", vid:false},
+];
+// كل التعليقات من نفس الحساب seen.by.two
+let comments = [
+  {t:"أين هذا المكان؟", meta:"قبل ٢٥ دقيقة"},
+  {t:"من أنتِ؟", meta:"قبل ٢٢ دقيقة"},
+  {t:"آسفة، سأسجّل الخروج. كان التطبيق موجوداً في الهاتف المستعمل.", meta:"قبل ١٨ دقيقة"},
+  {t:"بحيرة سوكتشون... هذا المكان هو بحيرة سوكتشون.", meta:"قبل ٣ دقائق"},
+];
+const ACCOUNT = "seen.by.two";
+
+let editOn=false, datesOn=false;
+
+const grid=document.getElementById('grid');
+function renderGrid(){
+  grid.innerHTML='';
+  posts.forEach((p,i)=>{
+    const c=document.createElement('div');
+    c.className='cell'+(datesOn?' showdate':'');
+    let media='';
+    if(p.src){
+      media = p.vid
+        ? `<video src="${p.src}" muted playsinline style="width:100%;height:100%;object-fit:cover"></video>`
+        : `<img src="${p.src}">`;
+    }
+    c.innerHTML=`<div class="date editable">${p.date}</div>${p.vid?'<div class="vid">▷</div>':''}${media}${p.src?'':`<div class="ph">${p.cap}</div>`}`;
+    const ph=c.querySelector('.ph');
+    if(ph) ph.addEventListener('click',e=>{e.stopPropagation(); pickCellImg(c,i);});
+    c.addEventListener('click',()=>openFeed(i));
+    grid.appendChild(c);
+  });
+  applyEdit();
+  document.getElementById('pcount').textContent = toArabicNum(posts.length);
+}
+function toArabicNum(n){ return String(n).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]); }
+
+function feedPostHTML(p){
+  let media = `<span>مكان الصورة<br>(اضغط)</span>`;
+  if(p.src){
+    media = p.vid
+      ? `<video src="${p.src}" controls playsinline style="width:100%;height:100%;object-fit:cover"></video>`
+      : `<img src="${p.src}">`;
+  }
+  return `<div class="fpost">
+    <div class="dhead"><div class="av"></div><div class="nm editable">${ACCOUNT}</div></div>
+    <div class="dimg" onclick="${p.src?'':'pickImg(this)'}">${media}</div>
+    <div class="dacts"><span>♡</span><span class="cbtn" onclick="goComment()">💬</span><span>➤</span><span class="sp"></span><span>🔖</span></div>
+    <div class="dlikes editable">٢ إعجاب</div>
+    <div class="dcap"><span class="u editable">${ACCOUNT}</span> <span class="editable">${p.cap}</span></div>
+    <div class="ddate editable">${p.date}</div>
+  </div>`;
+}
+function openFeed(idx){
+  const fs=document.getElementById('feedscroll');
+  fs.innerHTML=posts.slice(idx).map(feedPostHTML).join('');
+  fs.scrollTop=0; applyEdit(); showPage('pageFeed');
+}
+
+const clist=document.getElementById('clist');
+function renderComments(){
+  clist.innerHTML='';
+  comments.forEach(cm=>{
+    const d=document.createElement('div');
+    d.className='citem';
+    d.innerHTML=`<div class="cav"></div><div class="cbody"><span class="cu editable">${ACCOUNT}</span> <span class="editable">${cm.t}</span><div class="cmeta"><span class="editable">${cm.meta}</span><span>رد</span><span>♡</span></div></div>`;
+    clist.appendChild(d);
+  });
+  applyEdit();
+}
+renderComments();
+
+function addComment(){
+  const f=document.getElementById('cfield');
+  const v=f.value.trim();
+  if(!v) return;
+  comments.push({t:v, meta:"الآن"});
+  renderComments();
+  f.value=''; document.getElementById('csend').disabled=true;
+  clist.scrollTop=clist.scrollHeight;
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goGrid(){ showPage('pageGrid'); }
+function goFeed(){ showPage('pageFeed'); }
+function goComment(){ renderComments(); showPage('pageComment'); }
+
+function toggleDates(){
+  datesOn=!datesOn;
+  renderGrid();
+}
+function applyEdit(){ document.querySelectorAll('.editable').forEach(el=>el.contentEditable=editOn); }
+function toggleEdit(){
+  editOn=!editOn;
+  document.getElementById('editstate').textContent=editOn?'ON':'OFF';
+  applyEdit();
+}
+
+// ===== 현장 게시물 올리기 =====
+let upMedia=null, upIsVid=false;
+function openUploader(){ document.getElementById('uploader').style.display='flex'; }
+function closeUploader(){
+  document.getElementById('uploader').style.display='none';
+  upMedia=null; upIsVid=false;
+  document.getElementById('upPreview').innerHTML='اضغط لاختيار صورة / فيديو';
+  document.getElementById('upCap').value='';
+  document.getElementById('upDate').value='الآن';
+  document.getElementById('upFile').value='';
+}
+function upPick(e){
+  const f=e.target.files[0]; if(!f) return;
+  upMedia=URL.createObjectURL(f);
+  upIsVid=f.type.startsWith('video');
+  const pv=document.getElementById('upPreview');
+  pv.innerHTML = upIsVid
+    ? `<video src="${upMedia}" muted playsinline style="width:100%;height:100%;object-fit:cover"></video>`
+    : `<img src="${upMedia}" style="width:100%;height:100%;object-fit:cover">`;
+}
+function upSubmit(){
+  const cap=document.getElementById('upCap').value.trim() || '(بدون وصف)';
+  const date=document.getElementById('upDate').value.trim() || 'الآن';
+  // 새 게시물은 맨 앞(최신)에 추가 → 그리드 첫 칸, 피드 최상단
+  posts.unshift({date:date, cap:cap, vid:upIsVid, src:upMedia});
+  renderGrid();
+  closeUploader();
+  goGrid();
+}
+
+function pickCellImg(cell,idx){
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*,video/*';
+  inp.onchange=e=>{const f=e.target.files[0]; if(!f)return; const url=URL.createObjectURL(f);
+    posts[idx].src=url; posts[idx].vid=f.type.startsWith('video'); renderGrid();};
+  inp.click();
+}
+
+renderGrid();
+function pickImg(box){
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=e=>{const f=e.target.files[0]; if(!f)return; const url=URL.createObjectURL(f);
+    box.querySelector('span').style.display='none';
+    let img=box.querySelector('img'); if(!img){img=document.createElement('img'); box.appendChild(img);} img.src=url;};
+  inp.click();
+}
+</script>
+</body>
+</html>
